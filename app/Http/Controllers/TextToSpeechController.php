@@ -17,15 +17,14 @@ class TextToSpeechController extends Controller
    	}
 
    	public function TextToSpeechConvert(Request $request)
-   	{	
-
+   	{
 	   	$request->validate([
 		    'text' => 'required|string|max:500',
-		    "lan" => "required",		    
+		    "lan" => "required",
 		]);
 
-		try {		
-			
+		try {
+
 			$tts = new VoiceRSS;
 			$voice = $tts->speech([
 			    'key' => env('VOICE_RSS_API_KEY'),
@@ -36,33 +35,33 @@ class TextToSpeechController extends Controller
 			    'f' => '44khz_16bit_stereo',
 			    'ssml' => 'false',
 			    'b64' => 'false'
-			]);	
-				
-			$filename = Str::uuid().'.mp3';
-			if( empty($voice["error"]) ) {		
+			]);
 
-				$rawData = $voice["response"];	
-				
+			$filename = Str::uuid().'.mp3';
+			if( empty($voice["error"]) ) {
+
+				$rawData = $voice["response"];
+
 				if (!File::exists(storage_path('app/public/speeches')))
 				{
 					Storage::makeDirectory(public_path('storage/speeches'));
 				}
 
 				Storage::disk('speeches')->put($filename, $rawData);
-				$speechFilelink =  asset('storage/speeches/'.$filename);							   		                 
-			   	$urls["play-url"] = $speechFilelink;		   	
-			   	$urls["download-file"] = $filename;			   
+				$speechFilelink =  asset('storage/speeches/'.$filename);
+			   	$urls["play-url"] = $speechFilelink;
+			   	$urls["download-file"] = $filename;
 			    $data = array('status' => 200, 'responseText' => $urls);
-	            return response()->json($data);		
+	            return response()->json($data);
 			}
 
 	   		$data = array('status' => 400, 'responseText' => "Please try again!");
-            return response()->json($data);     
+            return response()->json($data);
 
-		} 
+		}
 		catch (SitemapParserException $e) {
 		    $data = array('status' => 400, 'responseText' => $e->getMessage());
             return response()->json($data);
-		}                     
+		}
    	}
 }

@@ -2,6 +2,8 @@
 
 namespace App\Library;
 
+use Exception;
+
 class VoiceRSS
 {
 	public function speech($settings) {
@@ -19,7 +21,7 @@ class VoiceRSS
 	private function _request($settings) {
     	$url = ((isset($settings['ssl']) && $settings['ssl']) ? 'https' : 'http') . '://api.voicerss.org/';
     	$ch = curl_init($url);
-		
+
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, (isset($settings['b64']) && $settings['b64']) ? 0 : 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=UTF-8'));
@@ -29,9 +31,9 @@ class VoiceRSS
 		$resp = curl_exec($ch);
 
 		curl_close($ch);
-		
+
 		$is_error = strpos($resp, 'ERROR') === 0;
-	    
+
     	return array(
     		'error' => ($is_error) ? $resp : null,
     		'response' => (!$is_error) ? $resp: null);
